@@ -8,6 +8,7 @@ static const char *__doc__ = "XDP loader\n"
 #include <string.h>
 #include <errno.h>
 #include <getopt.h>
+#include <sys/resource.h>
 
 #include <bpf/bpf.h>
 #include <bpf/libbpf.h>
@@ -159,6 +160,13 @@ int main(int argc, char **argv)
 {
 	struct bpf_object *bpf_obj;
 
+	struct rlimit r = {RLIM_INFINITY, RLIM_INFINITY};
+ 
+        if (setrlimit(RLIMIT_MEMLOCK, &r)) {
+                perror("setrlimit(RLIMIT_MEMLOCK)");
+                return 1;
+        }
+	
 	struct config cfg = {
 		.xdp_flags = XDP_FLAGS_UPDATE_IF_NOEXIST | XDP_FLAGS_DRV_MODE,
 		.ifindex   = -1,
