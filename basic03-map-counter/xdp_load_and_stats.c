@@ -136,7 +136,7 @@ static void stats_print(struct stats_record *stats_rec,
 		packets = rec->total.rx_packets - prev->total.rx_packets;
 		pps     = packets / period;
 
-		printf(fmt, action, rec->total.rx_packets, pps, period);
+		printf(fmt, action, rec->total.rx_packets, rec->total.rx_bytes, pps, period);
 	}
 }
 
@@ -181,6 +181,7 @@ static bool map_collect(int fd, __u32 map_type, __u32 key, struct record *rec)
 
 	/* Assignment#1: Add byte counters */
 	rec->total.rx_packets = value.rx_packets;
+	rec->total.rx_bytes = value.rx_bytes;
 	return true;
 }
 
