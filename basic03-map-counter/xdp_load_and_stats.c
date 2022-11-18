@@ -97,7 +97,7 @@ struct record {
 };
 
 struct stats_record {
-	struct record stats[1]; /* Assignment#2: Hint */
+	struct record stats[5]; /* Assignment#2: Hint */
 };
 
 static double calc_period(struct record *r, struct record *p)
@@ -128,7 +128,7 @@ static void stats_print(struct stats_record *stats_rec,
 		const char *action = action2str(XDP_PASS);
 		rec  = &stats_rec->stats[0];
 		prev = &stats_prev->stats[0];
-
+	
 		period = calc_period(rec, prev);
 		if (period == 0)
 		       return;
@@ -137,6 +137,59 @@ static void stats_print(struct stats_record *stats_rec,
 		pps     = packets / period;
 
 		printf(fmt, action, rec->total.rx_packets, rec->total.rx_bytes, pps, period);
+		
+		action = action2str(XDP_ABORTED);
+		rec  = &stats_rec->stats[1];
+		prev = &stats_prev->stats[1];
+	
+		period = calc_period(rec, prev);
+		if (period == 0)
+		       return;
+
+		packets = rec->total.rx_packets - prev->total.rx_packets;
+		pps     = packets / period;
+
+		printf(fmt, action, rec->total.rx_packets, rec->total.rx_bytes, pps, period);
+		
+		action = action2str(XDP_DROP);
+		rec  = &stats_rec->stats[2];
+		prev = &stats_prev->stats[2];
+	
+		period = calc_period(rec, prev);
+		if (period == 0)
+		       return;
+
+		packets = rec->total.rx_packets - prev->total.rx_packets;
+		pps     = packets / period;
+
+		printf(fmt, action, rec->total.rx_packets, rec->total.rx_bytes, pps, period);
+		
+		action = action2str(XDP_TX);
+		rec  = &stats_rec->stats[3];
+		prev = &stats_prev->stats[3];
+	
+		period = calc_period(rec, prev);
+		if (period == 0)
+		       return;
+
+		packets = rec->total.rx_packets - prev->total.rx_packets;
+		pps     = packets / period;
+
+		printf(fmt, action, rec->total.rx_packets, rec->total.rx_bytes, pps, period);
+		
+		action = action2str(XDP_REDIRECT);
+		rec  = &stats_rec->stats[4];
+		prev = &stats_prev->stats[4];
+	
+		period = calc_period(rec, prev);
+		if (period == 0)
+		       return;
+
+		packets = rec->total.rx_packets - prev->total.rx_packets;
+		pps     = packets / period;
+
+		printf(fmt, action, rec->total.rx_packets, rec->total.rx_bytes, pps, period);
+		
 	}
 }
 
@@ -190,8 +243,16 @@ static void stats_collect(int map_fd, __u32 map_type,
 {
 	/* Assignment#2: Collect other XDP actions stats  */
 	__u32 key = XDP_PASS;
+	__u32 key2 = XDP_ABORTED;
+	__u32 key3 = XDP_DROP;
+	__u32 key4 = XDP_TX;
+	__u32 key5 = XDP_REDIRECT;
 
 	map_collect(map_fd, map_type, key, &stats_rec->stats[0]);
+	map_collect(map_fd, map_type, key2, &stats_rec->stats[1]);
+	map_collect(map_fd, map_type, key3, &stats_rec->stats[2]);
+	map_collect(map_fd, map_type, key4, &stats_rec->stats[3]);
+	map_collect(map_fd, map_type, key5, &stats_rec->stats[4]);
 }
 
 static void stats_poll(int map_fd, __u32 map_type, int interval)
