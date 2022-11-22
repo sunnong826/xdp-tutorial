@@ -1,0 +1,2 @@
+../testenv/testenv.sh setup/resest --name veth-basic02
+./xdp_loader --dev <dev name> --force --progsec <prog_sec_name>
