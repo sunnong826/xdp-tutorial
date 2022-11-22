@@ -7,6 +7,7 @@ static const char *__doc__ = "XDP loader and stats program\n"
 #include <string.h>
 #include <errno.h>
 #include <getopt.h>
+#include <sys/resource.h>
 
 #include <locale.h>
 #include <unistd.h>
@@ -338,6 +339,13 @@ int main(int argc, char **argv)
 	int interval = 2;
 	int err;
 
+	struct rlimit r = {RLIM_INFINITY, RLIM_INFINITY};
+ 
+        if (setrlimit(RLIMIT_MEMLOCK, &r)) {
+                perror("setrlimit(RLIMIT_MEMLOCK)");
+                return 1;
+        }
+	
 	struct config cfg = {
 		.xdp_flags = XDP_FLAGS_UPDATE_IF_NOEXIST | XDP_FLAGS_DRV_MODE,
 		.ifindex   = -1,
